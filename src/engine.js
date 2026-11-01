@@ -1,4 +1,4 @@
-import { PRESETS, ENDINGS, SCENARIOS } from './data.js';
+import { PRESETS, ENDINGS, SCENARIOS } from './data.js?v=1.1.0';
 
 const freeze = value => {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
@@ -47,6 +47,9 @@ function createTicket(scenarioId, random) {
   let numbers = [...drawNumbers];
   if (scenarioId === 'second') numbers = [...drawNumbers.slice(0, 5), bonus];
   if (scenarioId === 'third') numbers = [...drawNumbers.slice(0, 5), bag[7]];
+  if (scenarioId === 'fourth') numbers = [...drawNumbers.slice(0, 4), bag[7], bag[8]];
+  if (scenarioId === 'fifth') numbers = [...drawNumbers.slice(0, 3), bag[7], bag[8], bag[9]];
+  if (scenarioId === 'blank') numbers = bag.slice(8, 14);
   return freeze({
     numbers: numbers.sort((a, b) => a - b), drawNumbers, bonus,
     drawId: 1408, ticketDrawId: scenarioId === 'wrong-draw' ? 1407 : 1408,
@@ -56,12 +59,21 @@ function createTicket(scenarioId, random) {
   });
 }
 
+function chooseScenario(random) {
+  let roll = randomUnit(random) * SCENARIOS.reduce((sum, scenario) => sum + scenario.weight, 0);
+  for (const scenario of SCENARIOS) {
+    roll -= scenario.weight;
+    if (roll < 0) return scenario.id;
+  }
+  return SCENARIOS[SCENARIOS.length - 1].id;
+}
+
 export function createRun({ mode = 'winner', gender = 'male', nickname = '', presetId, random = Math.random, scenarioId } = {}) {
   const safeMode = mode === 'random' ? 'random' : 'winner';
   const safeGender = gender === 'female' ? 'female' : 'male';
   const preset = PRESETS.find(item => item.id === presetId && item.gender === safeGender) ?? choosePreset(safeGender, random);
   const scenario = safeMode === 'winner' ? 'normal' : SCENARIOS.some(item => item.id === scenarioId)
-    ? scenarioId : SCENARIOS[Math.floor(randomUnit(random) * SCENARIOS.length)].id;
+    ? scenarioId : chooseScenario(random);
   return freeze({
     sceneId: 'arrival', mode: safeMode, gender: safeGender, scenarioId: scenario,
     nickname: normalizeNickname(nickname), presetId: preset.id,
@@ -73,7 +85,7 @@ export function createRun({ mode = 'winner', gender = 'male', nickname = '', pre
 }
 
 const narrativeOrder = ['arrival', 'ticket', 'evening', 'scan', 'compare', 'verification', 'reaction', 'response', 'protect', 'checklist', 'next-day', 'commute', 'lobby', 'desk', 'confirm', 'receipt', 'breathe', 'future'];
-const ranks = { 1: '1등', 2: '2등', 3: '3등', 0: '미당첨' };
+const ranks = { 1: '1등', 2: '2등', 3: '3등', 4: '4등', 5: '5등', 0: '미당첨' };
 const action = (id, label, hint) => ({ id, label, ...(hint ? { hint } : {}) });
 
 function story(run) {
@@ -101,7 +113,9 @@ function story(run) {
       background: 'room', speaker: '확인 앱', title: run.checkMethod === 'numbers' ? '한 칸씩 천천히' : '작은 네모 안의 행운', phone: true, ticket: true,
       text: run.scenarioId === 'wrong-draw'
         ? '제1408회 결과가 열린다. 내 표의 숫자가 화면에 줄줄이 있다. 하나, 둘… 여섯?\n\n“잠깐. 나 지금 부자 된 거야?”\n\n의자에서 벌떡 일어났다 다시 앉는다. 이런 건 앉아서 봐야 한다. 숫자 아래 작은 회차 표시가 눈에 들어온다. 종이와 화면을 붙여 놓고 한 번 더 보자.'
-        : '숫자가 하나씩 나타난다. 아는 숫자가 자꾸 보인다. 분명 아까까지는 설거지가 걱정이었는데 지금은 손이 떨린다.\n\n“잠깐. 방금 뭐라고 떴지?”\n\n휴대폰을 내려놓고 눈을 비빈다. 화면 밝기도 올린다. 밝기를 올린다고 등수가 올라가진 않겠지만, 일단 잘 보이긴 한다.',
+        : ['fourth', 'fifth', 'blank'].includes(run.scenarioId)
+          ? '앱이 표의 여섯 숫자를 읽는다. 아직 결과가 뜨기도 전에 집 평면도부터 떠올린다.\n\n“일단 번호부터 보자. 거실 소파는 나중에.”\n\n종이와 결과를 나란히 놓는다. 작은 화면에 내 하루가 달려 있는 것 같지만, 라면 그릇도 옆에서 조용히 기다리고 있다.'
+          : '숫자가 하나씩 나타난다. 아는 숫자가 자꾸 보인다. 분명 아까까지는 설거지가 걱정이었는데 지금은 손이 떨린다.\n\n“잠깐. 방금 뭐라고 떴지?”\n\n휴대폰을 내려놓고 눈을 비빈다. 화면 밝기도 올린다. 밝기를 올린다고 등수가 올라가진 않겠지만, 일단 잘 보이긴 한다.',
       choices: [action('next', '종이와 화면을 나란히 놓는다')],
     },
     compare: {
@@ -186,6 +200,13 @@ function story(run) {
       text: '은행 앞 공원 벤치에 앉았다. 자판기 음료를 뽑다가 동전 하나를 떨어뜨려 열심히 주웠다. 부자가 되어도 이건 아깝다.\n\n이제 뭘 먼저 하지? 집? 여행? 퇴사? 아니면 밀린 잠부터?\n\n휴대폰 메모를 켜니 하고 싶은 일이 줄줄이 나온다. 드디어 오늘 가장 즐거운 고민이 시작됐다.',
       choices: [action('next', run.verifiedRank === 1 ? '가장 먼저 할 일을 고른다' : '오늘의 이야기를 마친다')],
     },
+    'small-prize': {
+      background: 'street', speaker: '가게 사장님', title: '동네에서 챙기는 작은 행운', progress: 0.85, ticket: true,
+      text: run.verifiedRank === 4
+        ? '“네 개 맞았네요. 5만 원이에요!” 사장님이 표를 확인한다.\n\n은행에 갈 필요 없이 동네에서 가상 수령을 마친다. 머릿속 대저택은 접었지만, 오늘 저녁 배달 메뉴는 한 단계 올릴 수 있다.\n\n“가게 간판은 못 바꿔 드려도 라면 두 개는 더 살게요.” 사장님도 웃는다.'
+        : '“세 개 맞았네. 5천 원!” 사장님이 웃으며 알려 준다.\n\n큰돈은 아니어도 표를 확인한 보람은 있다. 진열대의 간식을 보다가 아까 먹은 라면이 떠오른다. 계란을 넣을 걸 그랬다.\n\n“오늘의 인생 역전은… 간식 예산부터.” 작은 행운도 일단 챙기자.',
+      choices: [action('claim', `${run.prizeLabel} 가상 수령하고 마무리한다`)],
+    },
     future: {
       background: 'park', speaker: name, title: '당첨 다음, 나의 첫 선택', stage: 'ending-choice',
       text: `수령 완료, ${run.prizeLabel}. 이제 내 첫 번째 큰 결정을 내릴 시간이다. 메모를 보니 사고 싶은 것과 하고 싶은 일, 보고 싶은 얼굴이 뒤섞여 있다.\n\n인생 계획서를 오늘 다 쓸 필요는 없다. 딱 하나, 가장 먼저 하고 싶은 일부터.\n\n“스무 가지나 되네. 이런 고민은 환영이지.”`,
@@ -197,7 +218,13 @@ function story(run) {
 
 function verificationScene(run) {
   const common = { background: 'room', speaker: '확인 앱', title: '다시 확인한 결과', ticket: true, phone: true, choices: [action('next', '확인한 결과를 받아들인다')] };
+  if (run.scenarioId === 'blank') return { ...common,
+    text: '이번 표는 미당첨이다. 휴대폰을 살짝 기울여 본다. 각도를 바꿔도 결과는 그대로다.\n\n“아까 상상 속 집에 소파까지 들여놨는데.”\n\n싱크대에는 현실의 라면 그릇이 남아 있다. 인생 계획 대신 오늘 밤 계획부터 다시 정하자.',
+    choices: [action('dishes', '현실의 설거지부터 끝내기'), action('snack', '남은 라면 맛있게 먹기'), action('dream', '상상 속 집들이만 마무리하기')],
+  };
   if (run.verifiedRank === 0) return { ...common, text: `“어? 내 표는 제1407회잖아.” 숫자는 제1408회와 같지만 회차가 다르다. 지난 결과를 찾아보니 ${run.ticket.ticketDrawNumbers.join('·')}, 보너스 ${run.ticket.ticketBonus}. 내 표는 미당첨이다.\n\n잠깐 부자였던 나는 다시 의자에 털썩 앉는다. 번호 아래 작은 글씨가 오늘따라 유난히 크게 보인다.\n\n“다음엔 회차부터. 제발 회차부터.”` };
+  if (run.verifiedRank === 4) return { ...common, text: '일반번호 네 개 일치. 4등, 5만 원!\n\n“부자는 아니지만 오늘 저녁은 바꿀 수 있겠다.” 머릿속 집 평면도를 지우고 배달 앱 메뉴판을 떠올린다.\n\n원본 표를 챙겨 동네 가게에서 가상 수령을 마치자. 이번에는 은행까지 갈 필요는 없다.' };
+  if (run.verifiedRank === 5) return { ...common, text: '일반번호 세 개 일치. 5등, 5천 원이다.\n\n“아까 라면에 계란 넣을까 말까 고민했는데.” 큰 꿈에서 작은 행복으로 계획을 수정한다.\n\n멀리 갈 필요는 없다. 표를 챙겨 동네 가게에서 가상 수령하고 오늘의 간식부터 골라 보자.' };
   if (run.verifiedRank === 2) return { ...common, text: '일반번호 다섯 개와 보너스 일치. 보너스를 여섯 번째 일반번호로 셌다! 정확한 결과는 2등, 7,000만 원이다.\n\n“아… 20억은 아니구나.” 잠깐 조용해졌다가 금액을 다시 본다.\n\n“그런데 7,000만 원도 엄청나잖아?” 입꼬리가 다시 올라간다. 머릿속 장바구니를 조금 현실적으로 고쳐 쓴다.' };
   if (run.verifiedRank === 3) return { ...common, text: '일반번호 다섯 개 일치. 마지막 숫자는 모양이 비슷했을 뿐이고, 보너스도 다르다. 정확한 결과는 3등, 150만 원이다.\n\n“아까 머릿속에서 집까지 샀는데.” 가구 배치까지 끝낸 나 자신이 조금 민망하다.\n\n그래도 150만 원. 오늘 라면에 계란만 넣은 게 갑자기 아쉬워진다. 이 정도면 좋은 날이다.' };
   return { ...common, text: run.scenarioId === 'crowded'
@@ -213,9 +240,21 @@ function resultScene(run) {
   } else if (run.outcome === 'laundry') {
     title = '주머니 확인은 다음부터';
     text = '세탁이 끝났다. 외투는 깨끗해졌고 표는 읽을 수 없게 흩어졌다. 원본이 훼손되어 수령할 수 없다. 섬유유연제 향이 이렇게 얄미운 건 처음이다.\n\n“우리 집에서 제일 비싼 빨래였네.”\n\n이번 이야기는 미수령으로 끝난다. 다음에는 세제보다 주머니 확인이 먼저다.';
+  } else if (run.scenarioId === 'blank') {
+    const variants = {
+      'blank-dishes': ['당첨 대신 설거지', '로또는 꽝이었고 싱크대는 깨끗해졌다. 오늘의 확실한 성과는 반짝이는 라면 그릇이다.\n\n“인생 역전은 미뤘고 집안일은 하나 줄였다.”\n\n휴대폰을 내려놓고 그릇을 엎어 둔다. 평범한 하루도 이렇게 한 칸 정리됐다.'],
+      'blank-snack': ['라면은 배신하지 않는다', '당첨 알림은 없었지만 남은 라면은 있었다. 따뜻하게 데워 한 입 먹는다. 번호 여섯 개보다 지금은 이 한 젓가락이 확실하다.\n\n“오늘의 수령품은 맛있는 야식.”\n\n배를 두드리고 휴대폰을 내려놓는다. 꽝이어도 저녁까지 망칠 필요는 없다.'],
+      'blank-dream': ['상상 속 집들이 종료', '아까 머릿속으로 산 집의 손님들을 정중히 배웅했다. 이사도, 가구 배송도 상상이라 취소 수수료가 없다는 게 다행이다.\n\n“좋은 집이었어. 거실 채광이 특히.”\n\n상상 속 현관문을 닫고 현실의 작은 방에서 기지개를 켠다.'],
+    };
+    [title, text] = variants[run.outcome] || variants['blank-dishes'];
   } else if (run.verifiedRank === 0) {
     title = '회차까지 봐야 한 장의 표';
     text = '지난 회차 표를 이번 결과와 맞춰 봤으니, 숫자가 같아도 당첨은 아니다. 오늘의 결과는 미당첨. 창밖을 보며 부자였던 30초를 조용히 보내 준다.\n\n상상 속 집들이 메뉴까지 정했는데 취소해야겠다. 설거지는 아직 싱크대에 그대로다.\n\n“일단 저것부터 치우자. 회차는 다음부터 크게 보기.”';
+  } else if (run.verifiedRank === 4 || run.verifiedRank === 5) {
+    title = run.verifiedRank === 4 ? '오늘 저녁은 업그레이드' : '계란 추가는 가능';
+    text = run.verifiedRank === 4
+      ? '4등, 5만 원 가상 수령 완료! 집을 사는 대신 오늘 먹고 싶던 저녁을 골랐다. 큰 계획은 접었지만 작은 행운까지 놓치지는 않았다.\n\n“사이드 메뉴도 하나 추가.” 오늘의 사치는 딱 이 정도다.'
+      : '5등, 5천 원 가상 수령 완료! 간식 하나를 골라 봉투에 담는다. 표 한 장이 대저택 대신 작은 야식을 데려왔다.\n\n“인생은 그대로고 간식은 생겼다.” 나쁘지 않은 마무리다.';
   } else {
     title = run.verifiedRank === 2 ? '보너스가 데려온 2등' : '다섯 숫자의 3등';
     text = `${ranks[run.verifiedRank]}, ${run.prizeLabel} 수령 완료! ${run.verifiedRank === 2 ? '일반번호 다섯 개와 보너스 하나가 오늘 일을 냈다.' : '일반번호 다섯 개가 오늘 저녁 메뉴를 바꿨다.'}\n\n처음 머릿속에 지었던 대저택은 일단 접어 둔다. 그래도 집으로 돌아가는 길에 먹고 싶었던 음식을 망설임 없이 주문했다.\n\n“축하는 축하니까.” 오늘은 작은 영수증까지 왠지 기념품 같다.`;
@@ -255,10 +294,19 @@ export function advance(run, choiceId) {
     updates.prizeLabel = updates.verifiedRank === 0 ? '수령 없음'
       : updates.verifiedRank === 2 ? '7,000만 원'
         : updates.verifiedRank === 3 ? '150만 원'
+          : updates.verifiedRank === 4 ? '5만 원'
+            : updates.verifiedRank === 5 ? '5천 원'
           : run.scenarioId === 'crowded' ? '5억 원' : '20억 원';
   }
   if (run.sceneId === 'verification' && run.verifiedRank === 0) {
-    sceneId = 'result'; updates.completed = true; updates.outcome = 'wrong-draw'; updates.ticketStatus = 'expired';
+    sceneId = 'result'; updates.completed = true;
+    updates.outcome = run.scenarioId === 'blank' ? `blank-${selected}` : 'wrong-draw';
+    if (run.scenarioId === 'wrong-draw') updates.ticketStatus = 'expired';
+  }
+  if (run.sceneId === 'verification' && [4, 5].includes(run.verifiedRank)) sceneId = 'small-prize';
+  if (run.sceneId === 'small-prize') {
+    if (run.claimed || ![4, 5].includes(run.verifiedRank)) return run;
+    sceneId = 'result'; updates.claimed = true; updates.completed = true; updates.outcome = 'small-prize';
   }
   if (run.sceneId === 'reaction') updates.reaction = selected;
   if (run.sceneId === 'response' && ['lost', 'laundry'].includes(run.scenarioId)) {

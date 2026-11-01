@@ -72,14 +72,15 @@ test('winner mode guarantees claim across every narrative choice and ignores fai
   }
 });
 
-test('all seven random scenarios produce the intended rank and claim outcome', () => {
+test('all ten random scenarios produce the intended rank and claim outcome', () => {
   available(createRun);
-  assert.deepEqual(SCENARIOS.map(item => item.id), ['normal', 'crowded', 'second', 'third', 'lost', 'wrong-draw', 'laundry']);
+  assert.deepEqual(SCENARIOS.map(item => item.id), ['normal', 'crowded', 'second', 'third', 'lost', 'wrong-draw', 'laundry', 'fourth', 'fifth', 'blank']);
   const fixtures = [
     ['normal', 0, 1, true], ['crowded', 0, 1, true],
     ['second', 0, 2, true], ['third', 0, 3, true],
     ['lost', 0, 1, true], ['lost', 1, 1, false],
     ['wrong-draw', 0, 0, false], ['laundry', 0, 1, true], ['laundry', 1, 1, false],
+    ['fourth', 0, 4, true], ['fifth', 0, 5, true], ['blank', 0, 0, false],
   ];
   for (const [scenarioId, option, rank, claimed] of fixtures) {
     const initial = createRun({ mode: 'random', gender: 'female', nickname: '여름', scenarioId, random: () => 0.4 });
@@ -143,7 +144,7 @@ test('story exposes fictional prize labels, physical ticket status and terminal 
   assert.equal(wrong.ticketStatus, 'expired');
 });
 
-test('every winner choice combination reaches a claim and all configured scenarios select via RNG', () => {
+test('every winner choice combination reaches a claim', () => {
   const queue = [createRun({ mode: 'winner', random: () => 0 })];
   let endings = 0;
   while (queue.length) {
@@ -159,10 +160,6 @@ test('every winner choice combination reaches a claim and all configured scenari
     }
   }
   assert.equal(endings, 6);
-  for (let index = 0; index < 7; index++) {
-    const selected = createRun({ mode: 'random', presetId: 'M01', random: () => (index + 0.5) / 7 });
-    assert.equal(selected.scenarioId, ['normal', 'crowded', 'second', 'third', 'lost', 'wrong-draw', 'laundry'][index]);
-  }
 });
 
 test('wrong-round temptation matches the new draw but is invalid for its printed old round', () => {

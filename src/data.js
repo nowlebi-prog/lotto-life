@@ -409,11 +409,14 @@ const endingData = [
 export const PRESETS = Object.freeze(presetData.map((preset, index) => Object.freeze({ ...preset, atlasIndex: index % 10 })));
 export const ENDINGS = Object.freeze(endingData.map((ending, index) => Object.freeze({ ...ending, text: endingStories[index], atlasIndex: index })));
 export const SCENARIOS = Object.freeze([
-  { id: 'normal', label: '평범하지 않은 행운', description: '차근차근 확인하고 1등 수령까지.' },
-  { id: 'crowded', label: '축하가 가득한 회차', description: '당첨자가 많은 가상 회차. 내 몫의 행운은 그대로.' },
-  { id: 'second', label: '보너스까지 한 번 더', description: '일반번호 다섯 개와 보너스를 구별하는 이야기.' },
-  { id: 'third', label: '여섯 번째 숫자', description: '들뜬 마음을 가라앉히고 정확한 등수를 확인한다.' },
-  { id: 'lost', label: '어디에 두었더라?', description: '보관 전 표를 놓친 순간, 돌아볼 곳을 고른다.' },
-  { id: 'wrong-draw', label: '숫자보다 먼저 회차', description: '맞아 보이는 숫자 아래의 회차를 확인한다.' },
-  { id: 'laundry', label: '주머니 속 종이 한 장', description: '세탁기 앞에서 내리는 작은 결정.' },
+  { id: 'normal', weight: 100, label: '평범하지 않은 행운', description: '차근차근 확인하고 1등 수령까지.' },
+  { id: 'crowded', weight: 30, label: '축하가 가득한 회차', description: '당첨자가 많은 가상 회차. 예상액과 확정액을 확인한다.' },
+  { id: 'second', weight: 50, label: '보너스까지 한 번 더', description: '일반번호 다섯 개와 보너스를 구별하는 이야기.' },
+  { id: 'third', weight: 100, label: '여섯 번째 숫자', description: '들뜬 마음을 가라앉히고 정확한 등수를 확인한다.' },
+  { id: 'lost', weight: 10, label: '어디에 두었더라?', description: '보관 전 표를 놓친 순간, 돌아볼 곳을 고른다.' },
+  { id: 'wrong-draw', weight: 450, label: '숫자보다 먼저 회차', description: '맞아 보이는 숫자 아래의 회차를 확인한다.' },
+  { id: 'laundry', weight: 10, label: '주머니 속 종이 한 장', description: '세탁기 앞에서 내리는 작은 결정.' },
+  { id: 'fourth', weight: 800, label: '오늘 저녁은 업그레이드', description: '네 숫자가 마련한 작은 기분 전환.' },
+  { id: 'fifth', weight: 2000, label: '계란 추가는 가능', description: '세 숫자로 생긴 소소한 기쁨.' },
+  { id: 'blank', weight: 6450, label: '평범한 하루의 반전', description: '꽝이어도 내가 고르는 짧은 결말.' },
 ].map(Object.freeze));
