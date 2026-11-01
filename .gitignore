@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.qa/
+.superpowers/
+.research/
+.env
+.env.*
+*.log
+.DS_Store

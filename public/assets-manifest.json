@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "generator": "built-in imagegen",
+  "ordering": "row-major, left to right then top to bottom",
+  "assets": {
+    "male": {
+      "src": "/assets/characters-male.webp",
+      "width": 1600,
+      "height": 960,
+      "bytes": 265592,
+      "alpha": true,
+      "columns": 5,
+      "rows": 2,
+      "cellWidth": 320,
+      "cellHeight": 480,
+      "ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05",
+        "M06",
+        "M07",
+        "M08",
+        "M09",
+        "M10"
+      ]
+    },
+    "female": {
+      "src": "/assets/characters-female.webp",
+      "width": 1600,
+      "height": 960,
+      "bytes": 237092,
+      "alpha": true,
+      "columns": 5,
+      "rows": 2,
+      "cellWidth": 320,
+      "cellHeight": 480,
+      "ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10"
+      ]
+    },
+    "room": {
+      "src": "/assets/room.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 86602,
+      "alpha": false
+    },
+    "street": {
+      "src": "/assets/street.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 190330,
+      "alpha": false
+    },
+    "bank": {
+      "src": "/assets/bank.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 119750,
+      "alpha": false
+    },
+    "endings": {
+      "src": "/assets/endings.webp",
+      "width": 1600,
+      "height": 1024,
+      "bytes": 389742,
+      "alpha": false,
+      "columns": 5,
+      "rows": 4,
+      "cellWidth": 320,
+      "cellHeight": 256,
+      "ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "E14",
+        "E15",
+        "E16",
+        "E17",
+        "E18",
+        "E19",
+        "E20"
+      ]
+    }
+  }
+}

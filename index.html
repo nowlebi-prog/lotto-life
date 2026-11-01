@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#152b42">
+  <meta name="description" content="오늘은 어떤 하루를 살아볼까요? 혼자 즐기는 로또 1등 체험과 랜덤 사건 게임. 로그인과 진행 저장 없이 약 10분.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self'; media-src 'self' blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>로또 라이프 — 오늘, 내 인생에 생긴 일</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/styles.css">
+  <link rel="preload" href="./assets/street.webp" as="image">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div id="app"><main id="main"><p class="boot-message">로또 라이프를 준비하고 있어요…</p></main></div>
+  <noscript><p class="noscript">이 게임은 브라우저의 JavaScript로 진행돼요. JavaScript를 켠 뒤 다시 열어 주세요.</p></noscript>
+  <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

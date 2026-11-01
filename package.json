@@ -1,0 +1,16 @@
+{
+  "name": "lotto-life",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "로그인과 저장 없이 즐기는 한국어 로또 당첨 체험과 이야기 게임",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs --source",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/engine.test.js",
+    "check": "node scripts/check.mjs",
+    "test:browser": "node tests/browser.test.mjs"
+  },
+  "engines": {"node": ">=22"}
+}
